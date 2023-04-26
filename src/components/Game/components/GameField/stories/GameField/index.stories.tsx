@@ -8,6 +8,13 @@ import earImage from './images/ear.svg';
 
 export const GameField: StoryFn = () => {
   const gameField = new GameFieldModel({
+    headerTitle: {
+      text: (
+        <>
+          Уровень 1<br /> <big>Найди названия</big>
+        </>
+      ),
+    },
     tasks: [
       {
         imageSrc: catImage,
@@ -37,6 +44,7 @@ export const GameField: StoryFn = () => {
         ],
       },
     ],
+    taskText: { text: 'Выбери первую букву слова' },
     plates: [
       [' ', 'Т', ' ', ' '],
       ['К', 'О', ' ', ' '],

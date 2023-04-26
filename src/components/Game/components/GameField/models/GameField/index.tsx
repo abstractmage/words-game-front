@@ -10,15 +10,7 @@ import { Plate } from '../Plate';
 import { Data, Options } from './types';
 
 export class GameField extends ElementModel<HTMLDivElement> {
-  public readonly headerTitle = new ElementModel<HTMLDivElement>({
-    props: {
-      children: (
-        <>
-          Уровень 1<br /> <big>Найди названия</big>
-        </>
-      ),
-    },
-  });
+  public readonly headerTitle: ElementModel<HTMLDivElement>;
 
   public readonly taskBlocks: {
     image: ElementModel<HTMLDivElement>;
@@ -26,8 +18,10 @@ export class GameField extends ElementModel<HTMLDivElement> {
     word: ElementModel<HTMLDivElement>;
   }[];
 
-  public readonly taskText = new ElementModel<HTMLDivElement>({
-    props: { children: 'Выбери первую букву слова' },
+  public readonly taskText: ElementModel<HTMLDivElement>;
+
+  public readonly successText = new ElementModel<HTMLDivElement>({
+    props: { children: 'Выполнено!', style: { opacity: 0 } },
   });
 
   public readonly selectedWord = new ElementModel<
@@ -57,8 +51,25 @@ export class GameField extends ElementModel<HTMLDivElement> {
 
   public readonly data: Data;
 
+  protected readonly _selectionData = {
+    plates: [] as Plate[],
+    state: 'selected' as PlateState,
+    hasDirections: false,
+    hasDark: false,
+  };
+
   public constructor(public readonly options: Options) {
     super(options);
+    this.headerTitle = new ElementModel(
+      'text' in options.headerTitle
+        ? {
+            props:
+              typeof options.headerTitle.text === 'string'
+                ? { dangerouslySetInnerHTML: { __html: options.headerTitle.text } }
+                : { children: options.headerTitle.text },
+          }
+        : options.headerTitle,
+    );
     this.taskBlocks = options.tasks.map((taskData) => ({
       image: new ElementModel({
         props: { style: { backgroundImage: `url(${taskData.imageSrc})` } },
@@ -68,6 +79,11 @@ export class GameField extends ElementModel<HTMLDivElement> {
         props: { style: { opacity: 0 }, children: taskData.word },
       }),
     }));
+    this.taskText = new ElementModel(
+      'text' in options.taskText
+        ? { props: { children: options.taskText.text } }
+        : options.taskText,
+    );
     this.field = new ElementModel(options.field);
     this.plates = compact(
       options.plates
@@ -79,7 +95,7 @@ export class GameField extends ElementModel<HTMLDivElement> {
                   x: j,
                   y: i,
                   letter: value,
-                  props: { state: 'default', directions: [], isActive: false },
+                  props: { state: 'default', directions: [], isActive: false, isHoverable: true },
                 }),
           ),
         )
@@ -94,17 +110,20 @@ export class GameField extends ElementModel<HTMLDivElement> {
 
   public async runWithSelectionByClick() {
     this.selectedWord.setProp('isCloseButtonMounted', true);
+    this._selectionData.state = 'selected';
+    this._selectionData.hasDirections = false;
 
     while (!this._checkIfAllWordsResolved()) {
-      let selectedPlates: Plate[] = [];
+      this._selectionData.plates = [];
 
       while (!this._checkIfSelectedWordExists()) {
         let activePlates: Plate[] = [];
 
-        if (selectedPlates.length) {
-          const lastSelectedPlate = selectedPlates[selectedPlates.length - 1];
+        if (this._selectionData.plates.length) {
+          const lastSelectedPlate =
+            this._selectionData.plates[this._selectionData.plates.length - 1];
           activePlates = uniq([
-            ...selectedPlates,
+            ...this._selectionData.plates,
             ...this._getNearPlates(lastSelectedPlate).filter(
               (plate) => plate.props.style?.opacity !== 0,
             ),
@@ -113,6 +132,9 @@ export class GameField extends ElementModel<HTMLDivElement> {
           activePlates = this.plates.filter((plate) => plate.props.style?.opacity !== 0);
         }
 
+        const inactivePlates = this.plates.filter(
+          (plate) => plate.props.style?.opacity !== 0 && !activePlates.includes(plate),
+        );
         activePlates.forEach((plate) => plate.setProp('isActive', true));
 
         this.selectedWord.setProp('isCloseButtonActive', true);
@@ -121,54 +143,72 @@ export class GameField extends ElementModel<HTMLDivElement> {
             (plate) =>
               new Promise<Plate>((resolve) => plate.setProp('onClick', () => resolve(plate))),
           ),
+          ...inactivePlates.map(
+            (plate) =>
+              new Promise<Plate>((resolve) => plate.setProp('onClick', () => resolve(plate))),
+          ),
           new Promise<typeof this.selectedWord>((resolve) =>
             this.selectedWord.setProp('onCloseButtonClick', () => resolve(this.selectedWord)),
           ),
           new Promise<void>((resolve) => {
-            document.body.onkeyup = (e) => e.key === 'Escape' && resolve();
+            this.setProp('onKeyUp', (e) => e.key === 'Escape' && resolve());
           }),
         ]);
         activePlates.forEach((plate) => plate.setProp('onClick', undefined));
         activePlates.forEach((plate) => plate.setProp('isActive', false));
         this.selectedWord.setProp('isCloseButtonActive', false);
 
-        if (clickedItem instanceof Plate) {
+        if (clickedItem instanceof Plate && activePlates.includes(clickedItem)) {
           const clickedPlate = clickedItem;
 
           if (clickedPlate.props.state === 'default') {
-            clickedPlate.setProp('state', 'selected');
-            selectedPlates = [...selectedPlates, clickedPlate];
+            this._selectionData.plates = [...this._selectionData.plates, clickedPlate];
           } else {
-            const clickedPlateQueueIndex = selectedPlates.indexOf(clickedPlate);
-            const resettingPlates = selectedPlates.slice(
+            const clickedPlateQueueIndex = this._selectionData.plates.indexOf(clickedPlate);
+            const resettingPlates = this._selectionData.plates.slice(
               clickedPlateQueueIndex,
-              selectedPlates.length,
+              this._selectionData.plates.length,
             );
-            resettingPlates.forEach((plate) => plate.setProp('state', 'default'));
-            selectedPlates = difference(selectedPlates, resettingPlates);
+            this._selectionData.plates = difference(this._selectionData.plates, resettingPlates);
           }
 
-          if (selectedPlates.length) {
-            this._writeSelectedWord(selectedPlates.map((plate) => plate.props.children).join(''));
+          this._updatePlateStates();
+
+          if (this._selectionData.plates.length) {
+            this._writeSelectedWord(
+              this._selectionData.plates.map((plate) => plate.props.children).join(''),
+            );
           } else {
             this._eraseSelectedWord();
           }
+        } else if (clickedItem instanceof Plate && inactivePlates.includes(clickedItem)) {
+          const clickedPlate = clickedItem;
+          this._selectionData.plates = [clickedPlate];
+          this._updatePlateStates();
+          this._writeSelectedWord(
+            this._selectionData.plates.map((plate) => plate.props.children).join(''),
+          );
         } else {
-          selectedPlates.forEach((plate) => plate.setProp('state', 'default'));
           this._eraseSelectedWord();
-          selectedPlates = [];
+          this._selectionData.plates = [];
+          this._updatePlateStates();
         }
       }
 
-      const word = selectedPlates.map((plate) => plate.letter).join('');
+      const word = this._selectionData.plates.map((plate) => plate.letter).join('');
       const wordTaskIndex = this.data.findIndex((taskData) => taskData.word === word);
 
       this.data[wordTaskIndex].isResolved = true;
-      selectedPlates.forEach((plate) => plate.setProp('state', 'success'));
-      this._resolveSelectedWord();
+      this._updatePlateStates();
+      this._successSelectedWord();
+      this._selectionData.plates.forEach((plate) => plate.setProp('state', 'success'));
+      difference(this.plates, this._selectionData.plates).forEach((plate) =>
+        plate.setProp('state', 'default'),
+      );
       await wait(500);
       await Promise.all([
-        ...selectedPlates.map((plate) => this._hidePlateByPoint(plate)),
+        ...this._selectionData.plates.map((plate) => this._hidePlateByPoint(plate)),
+        this._moveSelectedWordToTaskBlock(),
         this._toggleTaskBlockByTaskBlockIndex(wordTaskIndex),
       ]);
       this.selectedWord.setProp('word', null);
@@ -184,9 +224,11 @@ export class GameField extends ElementModel<HTMLDivElement> {
 
   public async runWithSelectionByPressAndDrag() {
     this.selectedWord.setProp('isCloseButtonMounted', false);
+    this._selectionData.state = 'pressed';
+    this._selectionData.hasDirections = true;
 
     while (!this._checkIfAllWordsResolved()) {
-      let selectedPlates: Plate[] = [];
+      this._selectionData.plates = [];
       const activePlates = this.plates.filter((plate) => plate.props.style?.opacity !== 0);
 
       activePlates.forEach((plate) => plate.setProp('isActive', true));
@@ -198,53 +240,40 @@ export class GameField extends ElementModel<HTMLDivElement> {
         ),
       );
 
-      selectedPlates.push(pressedPlate);
-      pressedPlate.setProp('state', 'pressed');
-      this._writeSelectedWord(selectedPlates.map((plate) => plate.props.children).join(''));
+      this._selectionData.plates.push(pressedPlate);
+      this._updatePlateStates();
+      this._writeSelectedWord(
+        this._selectionData.plates.map((plate) => plate.props.children).join(''),
+      );
 
       activePlates.forEach((plate) => {
         plate.setProp('onMouseEnter', () => {
-          if (selectedPlates.includes(plate)) {
-            const currentSelectedPlateIndex = selectedPlates.indexOf(plate);
-            selectedPlates = selectedPlates.slice(0, currentSelectedPlateIndex + 1);
+          if (this._selectionData.plates.includes(plate)) {
+            const currentSelectedPlateIndex = this._selectionData.plates.indexOf(plate);
+            this._selectionData.plates = this._selectionData.plates.slice(
+              0,
+              currentSelectedPlateIndex + 1,
+            );
           } else {
-            const lastSelectedPlate = selectedPlates[selectedPlates.length - 1];
+            const lastSelectedPlate =
+              this._selectionData.plates[this._selectionData.plates.length - 1];
             const nearPlates = this._getNearPlates(lastSelectedPlate);
 
             if (nearPlates.includes(plate)) {
-              selectedPlates.push(plate);
+              this._selectionData.plates.push(plate);
             }
           }
 
-          this.plates.forEach((plate) => {
-            plate.updateProps({ state: 'default', directions: [] });
-          });
-
-          selectedPlates.forEach((plate, i) => {
-            const directions: PlateDirection[] = [];
-            const prevPlate: Plate | undefined = selectedPlates[i - 1];
-            const nextPlate: Plate | undefined = selectedPlates[i + 1];
-
-            if (prevPlate && plate.x - prevPlate.x > 0) directions.push('left');
-            else if (prevPlate && plate.y - prevPlate.y > 0) directions.push('top');
-            else if (prevPlate && plate.x - prevPlate.x < 0) directions.push('right');
-            else if (prevPlate && plate.y - prevPlate.y < 0) directions.push('bottom');
-
-            if (nextPlate && plate.x - nextPlate.x > 0) directions.push('left');
-            else if (nextPlate && plate.y - nextPlate.y > 0) directions.push('top');
-            else if (nextPlate && plate.x - nextPlate.x < 0) directions.push('right');
-            else if (nextPlate && plate.y - nextPlate.y < 0) directions.push('bottom');
-
-            plate.updateProps({ state: 'pressed', directions });
-          });
-
-          this._writeSelectedWord(selectedPlates.map((plate) => plate.props.children).join(''));
+          this._updatePlateStates();
+          this._writeSelectedWord(
+            this._selectionData.plates.map((plate) => plate.props.children).join(''),
+          );
         });
       });
 
       await new Promise<void>((resolve) => {
-        document.body.onmouseup = () => resolve();
-        document.body.onkeyup = (e) => e.key === 'Escape' && resolve();
+        this.setProp('onMouseUp', () => resolve());
+        this.setProp('onKeyUp', (e) => e.key === 'Escape' && resolve());
       });
       activePlates.forEach((plate) => plate.setProp('onMouseEnter', undefined));
 
@@ -254,25 +283,45 @@ export class GameField extends ElementModel<HTMLDivElement> {
         );
 
         this.data[wordTaskIndex].isResolved = true;
-        selectedPlates.forEach((plate) =>
+        this._selectionData.plates.forEach((plate) =>
           plate.updateProps({ state: 'pressedSuccess', isActive: false }),
         );
-        this._resolveSelectedWord();
+        difference(this.plates, this._selectionData.plates).forEach((plate) =>
+          plate.setProp('state', 'default'),
+        );
+        this._successSelectedWord();
         await wait(500);
         await Promise.all([
-          ...selectedPlates.map((plate) =>
+          ...this._selectionData.plates.map((plate) =>
             animateOpacity({ element: plate, fromOpacity: 1, toOpacity: 0 }),
           ),
+          this._moveSelectedWordToTaskBlock(),
           this._toggleTaskBlockByTaskBlockIndex(wordTaskIndex),
           !this._checkIfAllWordsResolved() && this._showTaskText(),
         ]);
-      } else {
-        selectedPlates.forEach((plate) => plate.setProp('state', 'pressedError'));
+      } else if (this.selectedWord.props.word?.length !== 1) {
+        this._selectionData.plates.forEach((plate) => plate.setProp('state', 'pressedError'));
         this.selectedWord.updateStyle({ backgroundColor: '#FF0000', color: '#FFFFFF' });
+        difference(this.plates, this._selectionData.plates).forEach((plate) =>
+          plate.setProp('state', 'default'),
+        );
         await wait(1000);
-        selectedPlates.forEach((plate) => plate.updateProps({ state: 'default', directions: [] }));
+        this._selectionData.plates.forEach((plate) =>
+          plate.updateProps({ state: 'default', directions: [] }),
+        );
         await Promise.all([this._hideSelectedWord(), this._showTaskText()]);
         this.selectedWord.updateStyle({ opacity: 0 });
+        this.selectedWord.setProp('word', null);
+      } else {
+        this._selectionData.plates.forEach((plate) =>
+          plate.updateProps({ state: 'default', directions: [] }),
+        );
+        difference(this.plates, this._selectionData.plates).forEach((plate) =>
+          plate.setProp('state', 'default'),
+        );
+        await Promise.all([this._hideSelectedWord(), this._showTaskText()]);
+        this.selectedWord.updateStyle({ opacity: 0 });
+        this.selectedWord.setProp('word', null);
       }
 
       activePlates.forEach((plate) => plate.setProp('isActive', false));
@@ -283,9 +332,11 @@ export class GameField extends ElementModel<HTMLDivElement> {
 
   public async runWithSelectionByClickAndDrag() {
     this.selectedWord.setProp('isCloseButtonMounted', false);
+    this._selectionData.state = 'pressed';
+    this._selectionData.hasDirections = true;
 
     while (!this._checkIfAllWordsResolved()) {
-      let selectedPlates: Plate[] = [];
+      this._selectionData.plates = [];
       const activePlates = this.plates.filter((plate) => plate.props.style?.opacity !== 0);
 
       activePlates.forEach((plate) => plate.setProp('isActive', true));
@@ -297,52 +348,39 @@ export class GameField extends ElementModel<HTMLDivElement> {
         ),
       );
 
-      selectedPlates.push(pressedPlate);
-      pressedPlate.setProp('state', 'pressed');
-      this._writeSelectedWord(selectedPlates.map((plate) => plate.props.children).join(''));
+      this._selectionData.plates.push(pressedPlate);
+      this._updatePlateStates();
+      this._writeSelectedWord(
+        this._selectionData.plates.map((plate) => plate.props.children).join(''),
+      );
       await wait(10);
 
       await new Promise<void>((resolve) => {
-        document.body.onclick = () => resolve();
-        document.body.onkeyup = (e) => e.key === 'Escape' && resolve();
+        this.setProp('onClick', () => resolve());
+        this.setProp('onKeyUp', (e) => e.key === 'Escape' && resolve());
 
         activePlates.forEach((plate) => {
           plate.setProp('onMouseEnter', () => {
-            if (selectedPlates.includes(plate)) {
-              const currentSelectedPlateIndex = selectedPlates.indexOf(plate);
-              selectedPlates = selectedPlates.slice(0, currentSelectedPlateIndex + 1);
+            if (this._selectionData.plates.includes(plate)) {
+              const currentSelectedPlateIndex = this._selectionData.plates.indexOf(plate);
+              this._selectionData.plates = this._selectionData.plates.slice(
+                0,
+                currentSelectedPlateIndex + 1,
+              );
             } else {
-              const lastSelectedPlate = selectedPlates[selectedPlates.length - 1];
+              const lastSelectedPlate =
+                this._selectionData.plates[this._selectionData.plates.length - 1];
               const nearPlates = this._getNearPlates(lastSelectedPlate);
 
               if (nearPlates.includes(plate)) {
-                selectedPlates.push(plate);
+                this._selectionData.plates.push(plate);
               }
             }
 
-            this.plates.forEach((plate) => {
-              plate.updateProps({ state: 'default', directions: [] });
-            });
-
-            selectedPlates.forEach((plate, i) => {
-              const directions: PlateDirection[] = [];
-              const prevPlate: Plate | undefined = selectedPlates[i - 1];
-              const nextPlate: Plate | undefined = selectedPlates[i + 1];
-
-              if (prevPlate && plate.x - prevPlate.x > 0) directions.push('left');
-              else if (prevPlate && plate.y - prevPlate.y > 0) directions.push('top');
-              else if (prevPlate && plate.x - prevPlate.x < 0) directions.push('right');
-              else if (prevPlate && plate.y - prevPlate.y < 0) directions.push('bottom');
-
-              if (nextPlate && plate.x - nextPlate.x > 0) directions.push('left');
-              else if (nextPlate && plate.y - nextPlate.y > 0) directions.push('top');
-              else if (nextPlate && plate.x - nextPlate.x < 0) directions.push('right');
-              else if (nextPlate && plate.y - nextPlate.y < 0) directions.push('bottom');
-
-              plate.updateProps({ state: 'pressed', directions });
-            });
-
-            this._writeSelectedWord(selectedPlates.map((plate) => plate.props.children).join(''));
+            this._updatePlateStates();
+            this._writeSelectedWord(
+              this._selectionData.plates.map((plate) => plate.props.children).join(''),
+            );
 
             if (this._checkIfSelectedWordExists()) resolve();
           });
@@ -357,23 +395,41 @@ export class GameField extends ElementModel<HTMLDivElement> {
         );
 
         this.data[wordTaskIndex].isResolved = true;
-        selectedPlates.forEach((plate) =>
+        this._selectionData.plates.forEach((plate) =>
           plate.updateProps({ state: 'pressedSuccess', isActive: false }),
         );
-        this._resolveSelectedWord();
+        difference(this.plates, this._selectionData.plates).forEach((plate) =>
+          plate.setProp('state', 'default'),
+        );
+        this._successSelectedWord();
         await wait(500);
         await Promise.all([
-          ...selectedPlates.map((plate) =>
+          ...this._selectionData.plates.map((plate) =>
             animateOpacity({ element: plate, fromOpacity: 1, toOpacity: 0 }),
           ),
+          this._moveSelectedWordToTaskBlock(),
           this._toggleTaskBlockByTaskBlockIndex(wordTaskIndex),
           !this._checkIfAllWordsResolved() && this._showTaskText(),
         ]);
-      } else {
-        selectedPlates.forEach((plate) => plate.setProp('state', 'pressedError'));
+      } else if (this.selectedWord.props.word?.length !== 1) {
+        this._selectionData.plates.forEach((plate) => plate.setProp('state', 'pressedError'));
         this.selectedWord.updateStyle({ backgroundColor: '#FF0000', color: '#FFFFFF' });
+        difference(this.plates, this._selectionData.plates).forEach((plate) =>
+          plate.setProp('state', 'default'),
+        );
         await wait(1000);
-        selectedPlates.forEach((plate) => plate.updateProps({ state: 'default', directions: [] }));
+        this._selectionData.plates.forEach((plate) =>
+          plate.updateProps({ state: 'default', directions: [] }),
+        );
+        await Promise.all([this._hideSelectedWord(), this._showTaskText()]);
+        this.selectedWord.updateStyle({ opacity: 0 });
+      } else {
+        this._selectionData.plates.forEach((plate) =>
+          plate.updateProps({ state: 'default', directions: [] }),
+        );
+        difference(this.plates, this._selectionData.plates).forEach((plate) =>
+          plate.setProp('state', 'default'),
+        );
         await Promise.all([this._hideSelectedWord(), this._showTaskText()]);
         this.selectedWord.updateStyle({ opacity: 0 });
       }
@@ -382,6 +438,97 @@ export class GameField extends ElementModel<HTMLDivElement> {
     }
 
     await this._runSuccessCheckMarkAndNextButton();
+  }
+
+  public reset() {
+    this.taskBlocks.forEach((taskBlock) => {
+      taskBlock.cells.updateStyle({ display: '', opacity: '' });
+      taskBlock.word.updateStyle({ opacity: 0 });
+    });
+    this.taskText.updateStyle({ display: '', opacity: '' });
+    this.successText.updateStyle({ opacity: 0 });
+    this.successCheckMark.updateStyle({ display: 'none', opacity: 0 });
+    this.nextButton.updateStyle({ display: 'none', opacity: 0 });
+    this.data.forEach((dataItem) => (dataItem.isResolved = false));
+    this._selectionData.plates = [];
+    this.plates.forEach((plate) => {
+      plate.updateProps({
+        style: {},
+        state: 'default',
+        directions: [],
+        isActive: false,
+        isHoverable: true,
+      });
+    });
+  }
+
+  public toggleHint() {
+    if (this._selectionData.hasDark) {
+      this.hintOff();
+    } else {
+      this.hintOn();
+    }
+  }
+
+  public hintOn() {
+    this._selectionData.hasDark = true;
+    this._updatePlateStates();
+  }
+
+  public hintOff() {
+    this._selectionData.hasDark = false;
+    this._updatePlateStates();
+  }
+
+  protected _updatePlateStates() {
+    if (this._selectionData.hasDark) {
+      if (this._selectionData.plates.length) {
+        const otherPlates = difference(this.plates, this._selectionData.plates);
+        otherPlates.forEach((plate) => plate.updateProps({ state: 'dark', directions: [] }));
+        this._selectionData.plates.forEach((plate) =>
+          plate.updateProps({ state: this._selectionData.state }),
+        );
+        const lastSelectedPlate = this._selectionData.plates[this._selectionData.plates.length - 1];
+        const nearPlates = this._getNearPlates(lastSelectedPlate);
+        nearPlates.forEach((plate) => {
+          if (!this._selectionData.plates.includes(plate)) {
+            plate.updateProps({ state: 'default', directions: [] });
+          }
+        });
+      } else {
+        const otherPlates = difference(this.plates, this._selectionData.plates);
+        otherPlates.forEach((plate) => plate.updateProps({ state: 'default', directions: [] }));
+        this._selectionData.plates.forEach((plate) =>
+          plate.updateProps({ state: this._selectionData.state }),
+        );
+      }
+    } else {
+      const otherPlates = difference(this.plates, this._selectionData.plates);
+      otherPlates.forEach((plate) => plate.updateProps({ state: 'default', directions: [] }));
+      this._selectionData.plates.forEach((plate) =>
+        plate.updateProps({ state: this._selectionData.state }),
+      );
+    }
+
+    if (this._selectionData.hasDirections) {
+      this._selectionData.plates.forEach((plate, i) => {
+        const directions: PlateDirection[] = [];
+        const prevPlate: Plate | undefined = this._selectionData.plates[i - 1];
+        const nextPlate: Plate | undefined = this._selectionData.plates[i + 1];
+
+        if (prevPlate && plate.x - prevPlate.x > 0) directions.push('left');
+        else if (prevPlate && plate.y - prevPlate.y > 0) directions.push('top');
+        else if (prevPlate && plate.x - prevPlate.x < 0) directions.push('right');
+        else if (prevPlate && plate.y - prevPlate.y < 0) directions.push('bottom');
+
+        if (nextPlate && plate.x - nextPlate.x > 0) directions.push('left');
+        else if (nextPlate && plate.y - nextPlate.y > 0) directions.push('top');
+        else if (nextPlate && plate.x - nextPlate.x < 0) directions.push('right');
+        else if (nextPlate && plate.y - nextPlate.y < 0) directions.push('bottom');
+
+        plate.setProp('directions', directions);
+      });
+    }
   }
 
   protected _setPlateStateByPoint(point: Point, state: PlateState, directions: PlateDirection[]) {
@@ -402,11 +549,16 @@ export class GameField extends ElementModel<HTMLDivElement> {
   }
 
   protected _eraseSelectedWord() {
-    this.taskText.updateStyle({});
+    this.taskText.updateStyle({ opacity: '' });
     this.selectedWord.setProp('word', null);
   }
 
-  protected async _resolveSelectedWord() {
+  protected async _successSelectedWord() {
+    this.selectedWord.updateStyle({ backgroundColor: '#8ACB00', color: '#FFFFFF' });
+    this.selectedWord.setProp('isCloseButtonMounted', false);
+  }
+
+  protected async _moveSelectedWordToTaskBlock() {
     const wordTaskIndex = this.data.findIndex(
       (taskData) => taskData.word === this.selectedWord.props.word,
     );
@@ -421,10 +573,6 @@ export class GameField extends ElementModel<HTMLDivElement> {
       cellsElementRect.width / 2 -
       (selectedWordElementRect.x + selectedWordElementRect?.width / 2);
     const y = cellsElementRect.y - selectedWordElementRect.y - cellsElementRect.height / 2;
-
-    this.selectedWord.updateStyle({ backgroundColor: '#8ACB00', color: '#FFFFFF' });
-    this.selectedWord.setProp('isCloseButtonMounted', false);
-
     const currentStyle = { transform: `translateX(-50%) translate(0px, 0px)`, opacity: 1 };
 
     await anime({
@@ -482,12 +630,12 @@ export class GameField extends ElementModel<HTMLDivElement> {
   }
 
   protected async _runSuccessCheckMarkAndNextButton() {
-    this.taskText.setProps({ children: 'Выполнено!', style: { opacity: 0 } });
+    this.successText.setProps({ children: 'Выполнено!', style: { opacity: 0 } });
     this.successCheckMark.updateStyle({ display: '', opacity: 0 });
     this.nextButton.updateStyle({ display: '', opacity: 0 });
 
     await Promise.all([
-      animateOpacity({ element: this.taskText, fromOpacity: 0, toOpacity: 1 }),
+      animateOpacity({ element: this.successText, fromOpacity: 0, toOpacity: 1 }),
       animateOpacity({ element: this.successCheckMark, fromOpacity: 0, toOpacity: 1 }),
       animateOpacity({ element: this.nextButton, fromOpacity: 0, toOpacity: 1 }),
     ]);

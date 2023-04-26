@@ -26,11 +26,12 @@ export const Plate = React.forwardRef(function Plate(
       ref={ref}
       className={cn(
         styles.main,
-        `${styles.main}_state_${state}`,
-        directions.map((direction) => `${styles.main}_direction_${direction}`),
-        isActive && `${styles.main}_isActive`,
-        isHoverable && `${styles.main}_isHoverable`,
-        isStateTransitioning && `${styles.main}_isStateTransitioning`,
+        'main',
+        `main_state_${state}`,
+        directions.map((direction) => `main_direction_${direction}`),
+        isActive && 'main_isActive',
+        isHoverable && 'main_isHoverable',
+        isStateTransitioning && 'main_isStateTransitioning',
         className,
       )}
     >

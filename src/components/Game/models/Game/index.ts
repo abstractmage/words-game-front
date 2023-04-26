@@ -1,6 +1,7 @@
-import { GameField } from 'src/components/GameField/models/GameField';
 import { animateOpacity } from 'src/shared/animateOpacity';
 import { ElementModel } from 'src/shared/ElementModel';
+import { GameField } from '../../components/GameField/models/GameField';
+import { Congrat } from '../Congrat';
 import { Options } from './types';
 
 export class Game extends ElementModel<HTMLDivElement> {
@@ -10,7 +11,9 @@ export class Game extends ElementModel<HTMLDivElement> {
 
   public readonly gameFields: GameField[];
 
-  public constructor(options: Options) {
+  public readonly congrat = new Congrat();
+
+  public constructor(public readonly options: Options) {
     super(options);
     this.gameFields = options.gameFields.map(
       (gameFieldOptions) =>
@@ -22,6 +25,9 @@ export class Game extends ElementModel<HTMLDivElement> {
           },
         }),
     );
+    this.hintButton.setProp('onClick', () => {
+      this.gameFields.forEach((gameField) => gameField.toggleHint());
+    });
   }
 
   public async runWithSelectionByClick() {
@@ -31,7 +37,15 @@ export class Game extends ElementModel<HTMLDivElement> {
       await gameField.runWithSelectionByClick();
       await animateOpacity({ element: gameField, fromOpacity: 1, toOpacity: 0 });
       gameField.updateStyle({ display: 'none', opacity: 0 });
+      gameField.reset();
     }
+
+    this.congrat.updateStyle({ display: '' });
+    await animateOpacity({ element: this.congrat, fromOpacity: 0, toOpacity: 1 });
+    await new Promise((resolve) => this.congrat.button.setProp('onClick', resolve));
+    await animateOpacity({ element: this.congrat, fromOpacity: 1, toOpacity: 0 });
+    this.congrat.updateStyle({ display: 'none' });
+    await this.runWithSelectionByClick();
   }
 
   public async runWithSelectionByPressAndDrag() {
@@ -41,7 +55,15 @@ export class Game extends ElementModel<HTMLDivElement> {
       await gameField.runWithSelectionByPressAndDrag();
       await animateOpacity({ element: gameField, fromOpacity: 1, toOpacity: 0 });
       gameField.updateStyle({ display: 'none', opacity: 0 });
+      gameField.reset();
     }
+
+    this.congrat.updateStyle({ display: '' });
+    await animateOpacity({ element: this.congrat, fromOpacity: 0, toOpacity: 1 });
+    await new Promise((resolve) => this.congrat.button.setProp('onClick', resolve));
+    await animateOpacity({ element: this.congrat, fromOpacity: 1, toOpacity: 0 });
+    this.congrat.updateStyle({ display: 'none' });
+    await this.runWithSelectionByPressAndDrag();
   }
 
   public async runWithSelectionByClickAndDrag() {
@@ -51,6 +73,14 @@ export class Game extends ElementModel<HTMLDivElement> {
       await gameField.runWithSelectionByClickAndDrag();
       await animateOpacity({ element: gameField, fromOpacity: 1, toOpacity: 0 });
       gameField.updateStyle({ display: 'none', opacity: 0 });
+      gameField.reset();
     }
+
+    this.congrat.updateStyle({ display: '' });
+    await animateOpacity({ element: this.congrat, fromOpacity: 0, toOpacity: 1 });
+    await new Promise((resolve) => this.congrat.button.setProp('onClick', resolve));
+    await animateOpacity({ element: this.congrat, fromOpacity: 1, toOpacity: 0 });
+    this.congrat.updateStyle({ display: 'none' });
+    await this.runWithSelectionByClickAndDrag();
   }
 }

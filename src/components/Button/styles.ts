@@ -2,10 +2,13 @@ import { createUseStyles } from 'react-jss';
 
 export const useStyles = createUseStyles({
   main: {
-    borderRadius: '100%',
+    borderRadius: '100px',
     backgroundColor: '#FFFFFF',
     color: 'var(--color)',
     boxShadow: '0 3px 0 var(--color)',
+    display: 'inline-flex',
+    justifyContent: 'center',
+    alignItems: 'center',
 
     '&_isClickable': {
       cursor: 'pointer',

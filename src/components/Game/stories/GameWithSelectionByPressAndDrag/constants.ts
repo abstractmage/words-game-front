@@ -1,13 +1,17 @@
-import ballImage from './images/ball.svg';
-import catImage from './images/cat.svg';
-import earImage from './images/ear.svg';
+import { Options } from '../../models/Game/types';
+import { getScaledValue } from '../../styles';
+import catImage from '../images/cat.svg';
 
-export const gameOptions = {
+export const gameOptions: Options = {
+  props: { style: { backgroundColor: '#D6E2BB' } },
   gameFields: [
     {
+      headerTitle: {
+        text: 'Уровень 1<br /> <big>Игрушка</big>',
+      },
       tasks: [
         {
-          word: 'КИТ',
+          word: 'МЯЧ',
           imageSrc: catImage,
           expectedCells: [
             { x: 0, y: 0 },
@@ -16,202 +20,201 @@ export const gameOptions = {
           ],
         },
       ],
-      plates: [['К', 'И', 'Т']],
+      taskText: {
+        text: `Нажми на букву слова и веди
+      курсором по остальным`,
+      },
+      plates: [['М', 'Я', 'Ч']],
       field: {
-        props: { style: { height: '370px' } },
+        props: { style: { height: getScaledValue('370px') } },
       },
     },
     {
+      headerTitle: {
+        text: 'Уровень 2<br /> <big>Они летают</big>',
+      },
       tasks: [
         {
-          word: 'КОТ',
+          word: 'ОСА',
           imageSrc: catImage,
-          expectedCells: [
-            { x: 0, y: 0 },
-            { x: 1, y: 0 },
-            { x: 2, y: 0 },
-          ],
-        },
-        {
-          word: 'ПЁС',
-          imageSrc: ballImage,
           expectedCells: [
             { x: 1, y: 1 },
-            { x: 2, y: 1 },
-            { x: 3, y: 1 },
+            { x: 1, y: 2 },
+            { x: 1, y: 3 },
           ],
         },
-      ],
-      plates: [
-        ['К', 'О', 'Т', ' '],
-        [' ', 'П', 'Ё', 'С'],
-      ],
-      field: {
-        props: { style: { height: '370px' } },
-      },
-    },
-    {
-      tasks: [
         {
-          word: 'НОС',
+          word: 'МУХА',
           imageSrc: catImage,
           expectedCells: [
+            { x: 0, y: 0 },
             { x: 1, y: 0 },
             { x: 2, y: 0 },
             { x: 3, y: 0 },
           ],
         },
-        {
-          word: 'УХО',
-          imageSrc: ballImage,
-          expectedCells: [
-            { x: 0, y: 1 },
-            { x: 1, y: 1 },
-            { x: 2, y: 1 },
-          ],
-        },
-        {
-          word: 'РОТ',
-          imageSrc: earImage,
-          expectedCells: [
-            { x: 1, y: 2 },
-            { x: 2, y: 2 },
-            { x: 3, y: 2 },
-          ],
-        },
       ],
-      plates: [
-        [' ', 'Н', 'О', 'С'],
-        ['У', 'Х', 'О', ' '],
-        [' ', 'Р', 'О', 'Т'],
-      ],
-      field: {
-        props: { style: { height: '450px' } },
+      taskText: {
+        text: `Нажми на букву слова и веди
+      курсором по остальным`,
       },
+      plates: [
+        ['М', 'У', 'Х', 'А'],
+        [' ', 'О', ' ', ' '],
+        [' ', 'С', ' ', ' '],
+        [' ', 'А', ' ', ' '],
+      ],
+      field: {},
     },
     {
-      tasks: [
-        {
-          word: 'ШАР',
-          imageSrc: catImage,
-          expectedCells: [
-            { x: 0, y: 0 },
-            { x: 0, y: 1 },
-            { x: 0, y: 2 },
-          ],
-        },
-        {
-          word: 'СОК',
-          imageSrc: ballImage,
-          expectedCells: [
-            { x: 1, y: 2 },
-            { x: 1, y: 3 },
-            { x: 1, y: 4 },
-          ],
-        },
-        {
-          word: 'ТОРТ',
-          imageSrc: earImage,
-          expectedCells: [
-            { x: 2, y: 0 },
-            { x: 2, y: 1 },
-            { x: 2, y: 2 },
-            { x: 2, y: 3 },
-          ],
-        },
-      ],
-      plates: [
-        ['Ш', ' ', 'Т'],
-        ['А', ' ', 'О'],
-        ['Р', 'С', 'Р'],
-        [' ', 'О', 'Т'],
-        [' ', 'К', ' '],
-      ],
-      field: {
-        props: { style: { width: '390px', height: '500px' } },
+      headerTitle: {
+        text: 'Уровень 3<br /> <big>Живут в лесу</big>',
       },
-    },
-    {
       tasks: [
         {
-          word: 'ГЛАЗ',
+          word: 'ЗАЯЦ',
           imageSrc: catImage,
-          expectedCells: [
-            { x: 0, y: 0 },
-            { x: 1, y: 0 },
-            { x: 2, y: 0 },
-            { x: 2, y: 1 },
-          ],
-        },
-        {
-          word: 'РУКА',
-          imageSrc: ballImage,
-          expectedCells: [
-            { x: 0, y: 2 },
-            { x: 1, y: 2 },
-            { x: 2, y: 2 },
-            { x: 3, y: 2 },
-          ],
-        },
-        {
-          word: 'НОГА',
-          imageSrc: earImage,
           expectedCells: [
             { x: 0, y: 4 },
             { x: 1, y: 4 },
             { x: 2, y: 4 },
+            { x: 3, y: 4 },
+          ],
+        },
+        {
+          word: 'ВОЛК',
+          imageSrc: catImage,
+          expectedCells: [
+            { x: 2, y: 0 },
+            { x: 2, y: 1 },
+            { x: 2, y: 2 },
             { x: 2, y: 3 },
           ],
         },
+        {
+          word: 'СОВА',
+          imageSrc: catImage,
+          expectedCells: [
+            { x: 0, y: 0 },
+            { x: 0, y: 1 },
+            { x: 0, y: 2 },
+            { x: 0, y: 3 },
+          ],
+        },
       ],
+      taskText: {
+        text: `Нажми на букву слова и веди
+      курсором по остальным`,
+      },
       plates: [
-        ['Г', 'Л', 'А', ' '],
-        [' ', ' ', 'З', ' '],
-        ['Р', 'У', 'К', 'А'],
-        [' ', ' ', 'А', ' '],
-        ['Н', 'О', 'Г', ' '],
+        ['С', ' ', 'В', ' '],
+        ['О', ' ', 'О', ' '],
+        ['В', ' ', 'Л', ' '],
+        ['А', ' ', 'К', ' '],
+        ['З', 'А', 'Я', 'Ц'],
       ],
+      field: {},
     },
     {
+      headerTitle: {
+        text: 'Уровень 4<br /> <big>Малыши</big>',
+      },
       tasks: [
         {
-          word: 'ШКАФ',
+          word: 'ПАУК',
+          imageSrc: catImage,
+          expectedCells: [
+            { x: 1, y: 2 },
+            { x: 2, y: 2 },
+            { x: 2, y: 3 },
+            { x: 3, y: 3 },
+          ],
+        },
+        {
+          word: 'УЛИТКА',
+          imageSrc: catImage,
+          expectedCells: [
+            { x: 0, y: 1 },
+            { x: 0, y: 2 },
+            { x: 0, y: 3 },
+            { x: 0, y: 4 },
+            { x: 1, y: 4 },
+            { x: 2, y: 4 },
+          ],
+        },
+        {
+          word: 'ЖУК',
           imageSrc: catImage,
           expectedCells: [
             { x: 1, y: 0 },
             { x: 2, y: 0 },
+            { x: 2, y: 1 },
+          ],
+        },
+      ],
+      taskText: {
+        text: `Нажми на букву слова и веди
+      курсором по остальным`,
+      },
+      plates: [
+        [' ', 'Ж', 'У', ' '],
+        ['У', ' ', 'К', ' '],
+        ['Л', 'П', 'А', ' '],
+        ['И', ' ', 'У', 'К'],
+        ['Т', 'К', 'А', ' '],
+      ],
+      field: {},
+    },
+    {
+      headerTitle: {
+        text: 'Уровень 5<br /> <big>Части тела</big>',
+      },
+      tasks: [
+        {
+          word: 'РУКА',
+          imageSrc: catImage,
+          expectedCells: [
+            { x: 1, y: 0 },
+            { x: 1, y: 1 },
             { x: 2, y: 1 },
             { x: 3, y: 1 },
           ],
         },
         {
-          word: 'СТОЛ',
-          imageSrc: ballImage,
+          word: 'НОГА',
+          imageSrc: catImage,
           expectedCells: [
-            { x: 0, y: 1 },
-            { x: 0, y: 2 },
-            { x: 1, y: 2 },
-            { x: 2, y: 2 },
-          ],
-        },
-        {
-          word: 'СТУЛ',
-          imageSrc: earImage,
-          expectedCells: [
+            { x: 0, y: 4 },
             { x: 1, y: 4 },
             { x: 1, y: 3 },
             { x: 2, y: 3 },
+          ],
+        },
+        {
+          word: 'ГОЛОВА',
+          imageSrc: catImage,
+          expectedCells: [
+            { x: 1, y: 2 },
+            { x: 2, y: 2 },
+            { x: 2, y: 2 },
+            { x: 3, y: 2 },
             { x: 3, y: 3 },
+            { x: 3, y: 4 },
           ],
         },
       ],
+      taskText: {
+        text: `Нажми на букву слова и веди
+      курсором по остальным`,
+      },
       plates: [
-        [' ', 'Ш', 'К', ' '],
-        ['С', ' ', 'А', 'Ф'],
-        ['Т', 'О', 'Л', ' '],
-        [' ', 'Т', 'У', 'Л'],
-        [' ', 'С', ' ', ' '],
+        [' ', 'Р', ' ', ' '],
+        [' ', 'У', 'К', 'А'],
+        ['Г', 'О', 'Л', 'О'],
+        [' ', 'Г', 'А', 'В'],
+        ['Н', 'О', ' ', 'А'],
       ],
+      field: {},
     },
   ],
 };

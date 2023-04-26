@@ -1,7 +1,8 @@
 import cn from 'classnames';
+import { merge } from 'lodash';
 import { observer } from 'mobx-react';
-import { Button } from '../Button';
-import { Icon } from '../Icon';
+import { Button } from 'src/components/Button';
+import { Icon } from 'src/components/Icon';
 import { Plate } from './components/Plate';
 import { ReactComponent as CheckMarkSprite } from './images/checkMark.svg';
 import { useStyles } from './styles';
@@ -12,7 +13,7 @@ export const GameField = observer(function GameField(props: Props) {
   const styles = useStyles();
 
   return (
-    <div {...otherProps} className={cn(styles.main, className)}>
+    <div {...merge(otherProps, model.props)} className={cn(styles.main, className)}>
       <div className="header">
         <div {...model.headerTitle.props} className="title" />
       </div>
@@ -32,6 +33,7 @@ export const GameField = observer(function GameField(props: Props) {
         ))}
       </div>
       <div {...model.taskText.props} className="taskText" />
+      <div {...model.successText.props} className="successText" />
       {model.selectedWord.props.word && (
         <div
           ref={model.selectedWord.setRefElement}

@@ -2,6 +2,7 @@ import React from 'react';
 
 export type State =
   | 'default'
+  | 'dark'
   | 'selected'
   | 'success'
   | 'pressed'
