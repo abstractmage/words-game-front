@@ -151,7 +151,7 @@ export class GameField extends ElementModel<HTMLDivElement> {
             this.selectedWord.setProp('onCloseButtonClick', () => resolve(this.selectedWord)),
           ),
           new Promise<void>((resolve) => {
-            this.setProp('onKeyUp', (e) => e.key === 'Escape' && resolve());
+            document.body.onkeyup = (e) => e.key === 'Escape' && resolve();
           }),
         ]);
         activePlates.forEach((plate) => plate.setProp('onClick', undefined));
@@ -246,34 +246,36 @@ export class GameField extends ElementModel<HTMLDivElement> {
         this._selectionData.plates.map((plate) => plate.props.children).join(''),
       );
 
-      activePlates.forEach((plate) => {
-        plate.setProp('onMouseEnter', () => {
-          if (this._selectionData.plates.includes(plate)) {
-            const currentSelectedPlateIndex = this._selectionData.plates.indexOf(plate);
-            this._selectionData.plates = this._selectionData.plates.slice(
-              0,
-              currentSelectedPlateIndex + 1,
-            );
-          } else {
-            const lastSelectedPlate =
-              this._selectionData.plates[this._selectionData.plates.length - 1];
-            const nearPlates = this._getNearPlates(lastSelectedPlate);
-
-            if (nearPlates.includes(plate)) {
-              this._selectionData.plates.push(plate);
-            }
-          }
-
-          this._updatePlateStates();
-          this._writeSelectedWord(
-            this._selectionData.plates.map((plate) => plate.props.children).join(''),
-          );
-        });
-      });
-
       await new Promise<void>((resolve) => {
         this.setProp('onMouseUp', () => resolve());
-        this.setProp('onKeyUp', (e) => e.key === 'Escape' && resolve());
+        document.body.onkeyup = (e) => e.key === 'Escape' && resolve();
+
+        activePlates.forEach((plate) => {
+          plate.setProp('onMouseEnter', () => {
+            if (this._selectionData.plates.includes(plate)) {
+              const currentSelectedPlateIndex = this._selectionData.plates.indexOf(plate);
+              this._selectionData.plates = this._selectionData.plates.slice(
+                0,
+                currentSelectedPlateIndex + 1,
+              );
+            } else {
+              const lastSelectedPlate =
+                this._selectionData.plates[this._selectionData.plates.length - 1];
+              const nearPlates = this._getNearPlates(lastSelectedPlate);
+
+              if (nearPlates.includes(plate)) {
+                this._selectionData.plates.push(plate);
+              }
+            }
+
+            this._updatePlateStates();
+            this._writeSelectedWord(
+              this._selectionData.plates.map((plate) => plate.props.children).join(''),
+            );
+
+            if (this._checkIfSelectedWordExists()) resolve();
+          });
+        });
       });
       activePlates.forEach((plate) => plate.setProp('onMouseEnter', undefined));
 
@@ -357,7 +359,7 @@ export class GameField extends ElementModel<HTMLDivElement> {
 
       await new Promise<void>((resolve) => {
         this.setProp('onClick', () => resolve());
-        this.setProp('onKeyUp', (e) => e.key === 'Escape' && resolve());
+        document.body.onkeyup = (e) => e.key === 'Escape' && resolve();
 
         activePlates.forEach((plate) => {
           plate.setProp('onMouseEnter', () => {
