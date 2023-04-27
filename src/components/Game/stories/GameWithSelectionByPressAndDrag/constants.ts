@@ -28,7 +28,7 @@ export const gameOptions: Options = {
         text: 'Уровень 1<br /> <big>Игрушка</big>',
       },
       tasksBlockElement: {
-        props: { style: { backgroundColor: 'rgb(42 232 255 / 15%)' } },
+        props: { style: { backgroundColor: '#9AE4FC' } },
       },
       tasks: [
         {
@@ -55,7 +55,7 @@ export const gameOptions: Options = {
         text: 'Уровень 2<br /> <big>Они летают</big>',
       },
       tasksBlockElement: {
-        props: { style: { backgroundColor: 'rgb(42 232 255 / 15%)' } },
+        props: { style: { backgroundColor: '#9AE4FC' } },
       },
       tasks: [
         {
@@ -95,7 +95,7 @@ export const gameOptions: Options = {
         text: 'Уровень 3<br /> <big>Живут в лесу</big>',
       },
       tasksBlockElement: {
-        props: { style: { backgroundColor: 'rgb(42 232 255 / 15%)' } },
+        props: { style: { backgroundColor: '#9AE4FC' } },
       },
       tasks: [
         {
@@ -147,7 +147,7 @@ export const gameOptions: Options = {
         text: 'Уровень 4<br /> <big>Малыши</big>',
       },
       tasksBlockElement: {
-        props: { style: { backgroundColor: 'rgb(42 232 255 / 15%)' } },
+        props: { style: { backgroundColor: '#9AE4FC' } },
       },
       tasks: [
         {
@@ -200,7 +200,7 @@ export const gameOptions: Options = {
         text: 'Уровень 5<br /> <big>Части тела</big>',
       },
       tasksBlockElement: {
-        props: { style: { backgroundColor: 'rgb(42 232 255 / 15%)' } },
+        props: { style: { backgroundColor: '#9AE4FC' } },
       },
       tasks: [
         {
