@@ -1,6 +1,17 @@
 import { Options } from '../../models/Game/types';
 import { getScaledValue } from '../../styles';
-import catImage from '../images/cat.svg';
+import eyeImage from '../images/eye.svg';
+import fishImage from '../images/fish.svg';
+import grassImage from '../images/grass.svg';
+import lemonImage from '../images/lemon.svg';
+import lionImage from '../images/lion.svg';
+import mushroomImage from '../images/mushroom.svg';
+import mustacheImage from '../images/mustache.svg';
+import rainbowImage from '../images/rainbow.svg';
+import riverImage from '../images/river.svg';
+import tongueImage from '../images/tongue.svg';
+import watermelonImage from '../images/watermelon.svg';
+import whaleImage from '../images/whale.svg';
 
 export const gameOptions: Options = {
   props: { style: { backgroundColor: '#EBE8D2' } },
@@ -12,7 +23,7 @@ export const gameOptions: Options = {
       tasks: [
         {
           word: 'ЛЕВ',
-          imageSrc: catImage,
+          imageSrc: lionImage,
           expectedCells: [
             { x: 0, y: 0 },
             { x: 1, y: 0 },
@@ -36,7 +47,7 @@ export const gameOptions: Options = {
       tasks: [
         {
           word: 'РЫБА',
-          imageSrc: catImage,
+          imageSrc: fishImage,
           expectedCells: [
             { x: 0, y: 0 },
             { x: 1, y: 0 },
@@ -46,7 +57,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'КИТ',
-          imageSrc: catImage,
+          imageSrc: whaleImage,
           expectedCells: [
             { x: 2, y: 1 },
             { x: 2, y: 2 },
@@ -73,7 +84,7 @@ export const gameOptions: Options = {
       tasks: [
         {
           word: 'ГЛАЗ',
-          imageSrc: catImage,
+          imageSrc: eyeImage,
           expectedCells: [
             { x: 0, y: 4 },
             { x: 1, y: 4 },
@@ -83,7 +94,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'ЯЗЫК',
-          imageSrc: catImage,
+          imageSrc: tongueImage,
           expectedCells: [
             { x: 2, y: 0 },
             { x: 2, y: 1 },
@@ -93,7 +104,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'УСЫ',
-          imageSrc: catImage,
+          imageSrc: mustacheImage,
           expectedCells: [
             { x: 1, y: 1 },
             { x: 1, y: 2 },
@@ -121,7 +132,7 @@ export const gameOptions: Options = {
       tasks: [
         {
           word: 'АРБУЗ',
-          imageSrc: catImage,
+          imageSrc: watermelonImage,
           expectedCells: [
             { x: 0, y: 2 },
             { x: 0, y: 3 },
@@ -132,7 +143,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'ЛИМОН',
-          imageSrc: catImage,
+          imageSrc: lemonImage,
           expectedCells: [
             { x: 1, y: 3 },
             { x: 2, y: 3 },
@@ -143,7 +154,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'ГРИБ',
-          imageSrc: catImage,
+          imageSrc: mushroomImage,
           expectedCells: [
             { x: 1, y: 0 },
             { x: 2, y: 0 },
@@ -172,7 +183,7 @@ export const gameOptions: Options = {
       tasks: [
         {
           word: 'ТРАВА',
-          imageSrc: catImage,
+          imageSrc: grassImage,
           expectedCells: [
             { x: 0, y: 1 },
             { x: 0, y: 2 },
@@ -183,7 +194,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'РАДУГА',
-          imageSrc: catImage,
+          imageSrc: rainbowImage,
           expectedCells: [
             { x: 1, y: 0 },
             { x: 2, y: 0 },
@@ -195,7 +206,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'РЕКА',
-          imageSrc: catImage,
+          imageSrc: riverImage,
           expectedCells: [
             { x: 0, y: 3 },
             { x: 0, y: 4 },

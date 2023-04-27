@@ -1,6 +1,17 @@
 import { Options } from '../../models/Game/types';
 import { getScaledValue } from '../../styles';
+import cakeImage from '../images/cake.svg';
 import catImage from '../images/cat.svg';
+import clownImage from '../images/clown.svg';
+import dogImage from '../images/dog.svg';
+import earImage from '../images/ear.svg';
+import juiceImage from '../images/juice.svg';
+import mouthImage from '../images/mouth.svg';
+import noseImage from '../images/nose.svg';
+import stoolImage from '../images/stool.svg';
+import tableImage from '../images/table.svg';
+import wardrobeImage from '../images/wardrobe.svg';
+import whaleImage from '../images/whale.svg';
 
 export const gameOptions: Options = {
   props: { style: { backgroundColor: '#BCF7FF' } },
@@ -12,7 +23,7 @@ export const gameOptions: Options = {
       tasks: [
         {
           word: 'КИТ',
-          imageSrc: catImage,
+          imageSrc: whaleImage,
           expectedCells: [
             { x: 0, y: 0 },
             { x: 1, y: 0 },
@@ -42,7 +53,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'ПЁС',
-          imageSrc: catImage,
+          imageSrc: dogImage,
           expectedCells: [
             { x: 1, y: 0 },
             { x: 1, y: 1 },
@@ -69,7 +80,7 @@ export const gameOptions: Options = {
       tasks: [
         {
           word: 'УХО',
-          imageSrc: catImage,
+          imageSrc: earImage,
           expectedCells: [
             { x: 0, y: 0 },
             { x: 0, y: 1 },
@@ -78,7 +89,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'РОТ',
-          imageSrc: catImage,
+          imageSrc: mouthImage,
           expectedCells: [
             { x: 1, y: 1 },
             { x: 2, y: 1 },
@@ -87,7 +98,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'НОС',
-          imageSrc: catImage,
+          imageSrc: noseImage,
           expectedCells: [
             { x: 2, y: 2 },
             { x: 2, y: 3 },
@@ -112,7 +123,7 @@ export const gameOptions: Options = {
       tasks: [
         {
           word: 'СОК',
-          imageSrc: catImage,
+          imageSrc: juiceImage,
           expectedCells: [
             { x: 0, y: 3 },
             { x: 1, y: 3 },
@@ -121,7 +132,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'ТОРТ',
-          imageSrc: catImage,
+          imageSrc: cakeImage,
           expectedCells: [
             { x: 2, y: 3 },
             { x: 3, y: 3 },
@@ -131,7 +142,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'КЛОУН',
-          imageSrc: catImage,
+          imageSrc: clownImage,
           expectedCells: [
             { x: 0, y: 0 },
             { x: 0, y: 1 },
@@ -158,7 +169,7 @@ export const gameOptions: Options = {
       tasks: [
         {
           word: 'ШКАФ',
-          imageSrc: catImage,
+          imageSrc: wardrobeImage,
           expectedCells: [
             { x: 1, y: 0 },
             { x: 2, y: 0 },
@@ -168,7 +179,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'СТОЛ',
-          imageSrc: catImage,
+          imageSrc: tableImage,
           expectedCells: [
             { x: 0, y: 1 },
             { x: 0, y: 2 },
@@ -178,7 +189,7 @@ export const gameOptions: Options = {
         },
         {
           word: 'СТУЛ',
-          imageSrc: catImage,
+          imageSrc: stoolImage,
           expectedCells: [
             { x: 1, y: 4 },
             { x: 1, y: 3 },
