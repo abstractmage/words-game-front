@@ -17,7 +17,7 @@ export const GameField = observer(function GameField(props: Props) {
       <div className="header">
         <div {...model.headerTitle.props} className="title" />
       </div>
-      <div className="tasksBlock">
+      <div {...model.tasksBlockElement.props} className="tasksBlock">
         {model.taskBlocks.map((taskBlock, i) => (
           <div key={i} className="taskBlock">
             <div {...taskBlock.image.props} className="image" />

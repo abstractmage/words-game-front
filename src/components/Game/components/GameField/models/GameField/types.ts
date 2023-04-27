@@ -4,6 +4,7 @@ export type Options = ElementModelOptions<React.HTMLAttributes<HTMLDivElement>> 
   headerTitle:
     | ElementModelOptions<React.HTMLAttributes<HTMLDivElement>>
     | { text: React.ReactNode };
+  tasksBlockElement?: ElementModelOptions<React.HTMLAttributes<HTMLDivElement>>;
   tasks: {
     imageSrc: string;
     word: string;

@@ -27,6 +27,9 @@ export const gameOptions: Options = {
       headerTitle: {
         text: 'Уровень 1<br /> <big>Пускает фонтан</big>',
       },
+      tasksBlockElement: {
+        props: { style: { backgroundColor: 'rgb(8 155 144 / 15%)' } },
+      },
       tasks: [
         {
           word: 'КИТ',
@@ -47,6 +50,9 @@ export const gameOptions: Options = {
     {
       headerTitle: {
         text: 'Уровень 2<br /> <big>Домашние любимцы</big>',
+      },
+      tasksBlockElement: {
+        props: { style: { backgroundColor: 'rgb(8 155 144 / 15%)' } },
       },
       tasks: [
         {
@@ -83,6 +89,9 @@ export const gameOptions: Options = {
     {
       headerTitle: {
         text: 'Уровень 3<br /> <big>На лице</big>',
+      },
+      tasksBlockElement: {
+        props: { style: { backgroundColor: 'rgb(8 155 144 / 15%)' } },
       },
       tasks: [
         {
@@ -126,6 +135,9 @@ export const gameOptions: Options = {
     {
       headerTitle: {
         text: 'Уровень 4<br /> <big>На дне рождения</big>',
+      },
+      tasksBlockElement: {
+        props: { style: { backgroundColor: 'rgb(8 155 144 / 15%)' } },
       },
       tasks: [
         {
@@ -172,6 +184,9 @@ export const gameOptions: Options = {
     {
       headerTitle: {
         text: 'Уровень 5<br /> <big>Мебель</big>',
+      },
+      tasksBlockElement: {
+        props: { style: { backgroundColor: 'rgb(8 155 144 / 15%)' } },
       },
       tasks: [
         {

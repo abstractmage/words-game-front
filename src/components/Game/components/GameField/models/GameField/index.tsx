@@ -12,6 +12,8 @@ import { Data, Options } from './types';
 export class GameField extends ElementModel<HTMLDivElement> {
   public readonly headerTitle: ElementModel<HTMLDivElement>;
 
+  public readonly tasksBlockElement: ElementModel<HTMLDivElement>;
+
   public readonly taskBlocks: {
     image: ElementModel<HTMLDivElement>;
     cells: ElementModel<HTMLDivElement>;
@@ -70,6 +72,7 @@ export class GameField extends ElementModel<HTMLDivElement> {
           }
         : options.headerTitle,
     );
+    this.tasksBlockElement = new ElementModel(options.tasksBlockElement);
     this.taskBlocks = options.tasks.map((taskData) => ({
       image: new ElementModel({
         props: { style: { backgroundImage: `url(${taskData.imageSrc})` } },
