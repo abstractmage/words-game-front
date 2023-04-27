@@ -1,5 +1,6 @@
 import { Options } from '../../models/Game/types';
 import { getScaledValue } from '../../styles';
+import backgroundImage3 from '../images/background3.svg';
 import eyeImage from '../images/eye.svg';
 import fishImage from '../images/fish.svg';
 import grassImage from '../images/grass.svg';
@@ -14,7 +15,13 @@ import watermelonImage from '../images/watermelon.svg';
 import whaleImage from '../images/whale.svg';
 
 export const gameOptions: Options = {
-  props: { style: { backgroundColor: '#EBE8D2' } },
+  props: {
+    style: {
+      backgroundImage: `url(${backgroundImage3})`,
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+    },
+  },
   gameFields: [
     {
       headerTitle: {
